@@ -3,7 +3,7 @@
 class GeneralFunctions{
 
     function returnValue($return, $status){
-        if ($status==='true')
+        if ($status)
             return json_encode(array(
                 'data' => json_encode($return),
                 'success' => true
@@ -15,7 +15,6 @@ class GeneralFunctions{
                 'success' => false
                 )
             );
-        // return json_encode(array('success' => false));
     }
 
 }
