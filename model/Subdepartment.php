@@ -74,7 +74,7 @@ class Subdepartment {
         if( isset( $identifier ) && isset($name)) {
             try {
                 $result = $this->collection->updateOne( 
-                    [ 'identifier'=>$identifier ],
+                    [ 'identifier'=>intval($identifier) ],
                     [ 
                         '$push' => [
                             'subdepartment' => [

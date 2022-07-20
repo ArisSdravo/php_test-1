@@ -151,7 +151,7 @@ class Department {
         if( isset( $identifier ) && isset($name)) {
             try {
                 $result = $this->collection->insertOne( [
-                    'identifier' => $identifier, 
+                    'identifier' => intval($identifier), 
                     'name' => $name,
                     'subdepartment' => [],
                     'categories' => [] 
