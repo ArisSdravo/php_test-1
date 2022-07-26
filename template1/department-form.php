@@ -23,6 +23,21 @@
         return $result;
     }
 
+    function deleteDepartment($id){
+        global $department;
+
+        $result = $department->deleteDepartment($id);
+        return $result;
+    }
+
+    function updateDepartment($data){
+        global $department;
+
+        $datatosave = json_decode(json_encode($data));
+        $result = $department->updatecDepartment($datatosave);
+        return $result;
+    }
+
     $connection = new Connection($MDB_USER, $MDB_PASS, $ATLAS_CLUSTER_SRV);
     $department = new Department($connection);
     header('Content-Type: text/html; charset:UTF-8');
@@ -32,6 +47,15 @@
 
     if ($_SERVER["REQUEST_METHOD"]=="POST"){
         
+        if (empty($_POST["id"])){
+            $update = false;
+            echo "XXXX>". $update. " >>>> ".$_POST["id"];
+        } else { 
+            $update = true;
+            echo "XXXX>". $update. " >>>> ".$_POST["id"];
+        }
+        
+
         if (empty($_POST["name"])){
             $nameErr = "Name is required";
         } else {
@@ -51,7 +75,30 @@
                 'identifier' => $_POST["identifier"],
                 'name' => $_POST["name"]
             );
-            $result = saveDepartment($data);
+            
+            if ($update) { 
+                $data = array(
+                    '_id' => $_POST["id"],
+                    'identifier' => $_POST["identifier"],
+                    'name' => $_POST["name"]
+                );
+                $result = updateDepartment($data);    
+            }
+            else {
+                $data = array(
+                    'identifier' => $_POST["identifier"],
+                    'name' => $_POST["name"]
+                );
+                $result = saveDepartment($data);
+            }
+        }
+    }
+
+    if ($_SERVER["REQUEST_METHOD"]=="GET"){
+        
+        if (isset($_GET["id"]) && !empty($_GET["id"])) {
+            $id = $_GET["id"];
+            $result = deleteDepartment($id);
         }
     }
   
@@ -64,6 +111,7 @@
     <head>
         <title>Departments</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
         <style>
             .error{
                 color:red;
@@ -83,12 +131,13 @@
         <!-- <?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?> -->
         
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
-            Identifier: <input type="text" name="identifier" value="<?php echo $identifier; ?>">
+            Identifier: <input type="text" name="identifier" id="identifier" value="<?php echo $identifier; ?>">
             <span class="error">* <?php echo $identifierErr; ?></span>
             <br><br>
-            Name: <input type="text" name="name" value="<?php echo $name; ?>">
+            Name: <input type="text" name="name" value="<?php echo $name; ?>" id="name">
             <span class="error">* <?php echo $nameErr; ?></span>
             <br><br>
+            <input type="hidden" name="id" id="id" value="">
             <input type="submit" name="Submit" value="Submit">
         </form>
         
@@ -100,6 +149,7 @@
                 <th>Αναγνωριστικό</th>
                 <th>Τμήματα</th>
                 <th>Κατηγορίες</th>
+                <th>Διαδικασίες</th>
             </tr>
             <?php
                 foreach ($showResults as $value){
@@ -116,11 +166,27 @@
                                 echo $valueX["name"]."<br>";
                             }
                         echo "</td>";
+                        echo "<td>";
+            ?>
+                            <button onclick="loadform(<?php echo '\''.$value['_id']['$oid'].'\',\''.$value['name'].'\',\''.$value['identifier'].'\''?>)">Update</button>
+                            <form method="delete" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+                                <input type="hidden" name="id" value="<?php echo $value['_id']['$oid']; ?>">
+                                <input type="submit" name="submit" value="Delete">
+                            </form>
+            <?php
+                    echo "</td>";
                     echo "</tr>";    
                 }
             ?>
         </table>
-
+        <script>
+            function loadform(id,name,identifier){
+                // console.log("xxxxxxx",id,name,identifier);
+                $('#name').val(name);
+                $('#identifier').val(identifier);
+                $('#id').val(id);
+            }
+        </script>
 
     </body>
 </html>
