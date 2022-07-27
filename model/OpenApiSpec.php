@@ -48,6 +48,17 @@ use OpenApi\Annotations as OA;
 *     url="http://localhost/",
 *     description="API server"
 * )
+* @OA\Components(
+*     @OA\SecurityScheme(
+*         securityScheme="bearerAuth",
+*         type="http",
+*         in="header",
+*         scheme="bearer",
+*         bearerFormat="JWT",
+*         name="Authorization",
+*     ),
+*     @OA\Attachable
+* )
 */
 class OpenApiSpec
 {
